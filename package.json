@@ -1,0 +1,30 @@
+{
+  "name": "hastinamotorparts",
+  "version": "1.0.0",
+  "description": "B2B Export Catalogue and Enquiry Platform for Hastina Motor Parts (ALISONS GENERAL TRADING LLP)",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspaces",
+    "build:catalogue": "node scripts/buildCatalogue.js",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "seed": "npm run seed --workspace=apps/api",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "motorcycle-parts",
+    "tuk-tuk-parts",
+    "export-catalogue",
+    "b2b",
+    "alisons-general-trading"
+  ],
+  "author": "ALISONS GENERAL TRADING LLP",
+  "license": "UNLICENSED"
+}

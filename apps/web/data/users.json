@@ -1,0 +1,55 @@
+[
+  {
+    "id": "usr_admin_01",
+    "email": "admin@hastinamotorparts.in",
+    "name": "Alisons Executive Admin",
+    "role": "SUPER_ADMIN",
+    "status": "active",
+    "passwordHash": "Admin@Hastina2026",
+    "allowedModules": [
+      "dashboard",
+      "parts",
+      "brands",
+      "categories",
+      "enquiries",
+      "import",
+      "analytics",
+      "users",
+      "settings"
+    ],
+    "createdAt": "2026-11-21T00:00:00.000Z"
+  },
+  {
+    "id": "usr_mgr_02",
+    "email": "manager@hastinamotorparts.in",
+    "name": "Export Sales Manager",
+    "role": "MANAGER",
+    "status": "active",
+    "passwordHash": "Manager@Hastina2026",
+    "allowedModules": [
+      "dashboard",
+      "parts",
+      "brands",
+      "categories",
+      "enquiries",
+      "import",
+      "analytics"
+    ],
+    "createdAt": "2026-11-21T00:00:00.000Z"
+  },
+  {
+    "id": "usr_edit_03",
+    "email": "editor@hastinamotorparts.in",
+    "name": "Technical Catalogue Editor",
+    "role": "EDITOR",
+    "status": "active",
+    "passwordHash": "Editor@Hastina2026",
+    "allowedModules": [
+      "dashboard",
+      "parts",
+      "brands",
+      "categories"
+    ],
+    "createdAt": "2026-11-21T00:00:00.000Z"
+  }
+]

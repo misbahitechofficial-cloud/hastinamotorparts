@@ -1,0 +1,55 @@
+[
+  {
+    "id": "RFQ-20261120-001",
+    "customerName": "Tariq Al-Mansoor",
+    "company": "Gulf Motor Supplies LLC",
+    "country": "United Arab Emirates",
+    "email": "procurement@gulfmotorspares.ae",
+    "phone": "+971 52 984 1120",
+    "type": "Wholesale Supply",
+    "message": "Urgent inquiry for 2025 Suzuki Access & Bajaj RE 4-Stroke components.",
+    "items": [
+      {
+        "partNumber": "39 1013 21",
+        "name": "'O' ring (Engine Crankcase)",
+        "quantity": 200
+      },
+      {
+        "partNumber": "11170-02L10-000",
+        "name": "COVER, CYLINDER HEAD",
+        "quantity": 50
+      },
+      {
+        "partNumber": "AA 1017 13",
+        "name": "Engine assly. comp.",
+        "quantity": 10
+      }
+    ],
+    "status": "NEW",
+    "createdAt": "2026-11-20T14:30:00.000Z"
+  },
+  {
+    "id": "RFQ-20261119-002",
+    "customerName": "Kwame Mensah",
+    "company": "Accra Auto Fleet Distributors",
+    "country": "Ghana",
+    "email": "k.mensah@accraparts.com",
+    "phone": "+233 24 555 8901",
+    "type": "Export Order",
+    "message": "Seeking container shipment of Bajaj Boxer BM150 cylinder assemblies and valves.",
+    "items": [
+      {
+        "partNumber": "36 AN00 14",
+        "name": "Ring set piston CNG / Petrol",
+        "quantity": 500
+      },
+      {
+        "partNumber": "AN 1014 18",
+        "name": "Valve - intake",
+        "quantity": 400
+      }
+    ],
+    "status": "QUOTED",
+    "createdAt": "2026-11-19T09:15:00.000Z"
+  }
+]

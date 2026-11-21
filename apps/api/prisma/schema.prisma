@@ -1,0 +1,217 @@
+// Prisma Schema for Hastina Motor Parts (ALISONS GENERAL TRADING LLP)
+// B2B Export Catalogue and Enquiry Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  SCOOTER
+  TUKTUK
+  CAR
+}
+
+enum PartGrade {
+  GENUINE
+  OES
+  AFTERMARKET
+}
+
+enum EnquiryStatus {
+  NEW
+  QUOTED
+  WON
+  LOST
+}
+
+enum Role {
+  SUPER_ADMIN
+  CATALOGUE
+  SALES
+}
+
+model Brand {
+  id        Int           @id @default(autoincrement())
+  name      String        @unique
+  slug      String        @unique
+  logoUrl   String?
+  types     VehicleType[]
+  sortOrder Int           @default(0)
+  isActive  Boolean       @default(true)
+  models    VehicleModel[]
+
+  @@map("brands")
+}
+
+model VehicleModel {
+  id        Int          @id @default(autoincrement())
+  brandId   Int
+  name      String
+  slug      String
+  type      VehicleType
+  imageUrl  String?
+  yearFrom  Int?
+  yearTo    Int?
+  isActive  Boolean      @default(true)
+  brand     Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  fitments  Fitment[]
+
+  @@unique([brandId, slug])
+  @@map("vehicle_models")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  parentId  Int?
+  name      String
+  slug      String
+  level     Int        // 1 = Category, 2 = Subcategory, 3 = Part Type
+  imageUrl  String?
+  sortOrder Int        @default(0)
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Category[] @relation("CategoryTree")
+  parts     Part[]
+
+  @@unique([parentId, slug])
+  @@map("categories")
+}
+
+model Part {
+  id          Int         @id @default(autoincrement())
+  partNumber  String      @unique // primary OEM/OES number, normalized for search
+  altNumbers  String[]    // cross reference part numbers
+  name        String
+  slug        String      @unique
+  categoryId  Int
+  grade       PartGrade   // GENUINE, OES, AFTERMARKET
+  description String?
+  specs       Json?       // key-value specs
+  weightKg    Decimal?    @db.Decimal(10, 3)
+  moq         Int?        @default(1)
+  images      PartImage[]
+  fitments    Fitment[]
+  isFeatured  Boolean     @default(false)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  category    Category    @relation(fields: [categoryId], references: [id])
+
+  @@index([partNumber])
+  @@index([categoryId])
+  @@map("parts")
+}
+
+model PartImage {
+  id        Int     @id @default(autoincrement())
+  partId    Int
+  url       String
+  sortOrder Int     @default(0)
+  part      Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
+
+  @@map("part_images")
+}
+
+model Fitment {
+  partId    Int
+  modelId   Int
+  notes     String?
+  part      Part         @relation(fields: [partId], references: [id], onDelete: Cascade)
+  model     VehicleModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@id([partId, modelId])
+  @@index([modelId])
+  @@map("fitments")
+}
+
+model Enquiry {
+  id            Int           @id @default(autoincrement())
+  refNo         String        @unique // e.g. ENQ-2026-000123
+  name          String
+  company       String?
+  country       String
+  email         String
+  phone         String?
+  message       String?
+  attachmentUrl String?
+  status        EnquiryStatus @default(NEW)
+  assignedTo    Int?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  items         EnquiryItem[]
+
+  @@index([status, createdAt])
+  @@map("enquiries")
+}
+
+model EnquiryItem {
+  id         Int     @id @default(autoincrement())
+  enquiryId  Int
+  partId     Int?
+  partNumber String  // text format so custom/unknown part numbers can be submitted
+  partName   String?
+  quantity   Int     @default(1)
+  enquiry    Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+
+  @@map("enquiry_items")
+}
+
+model SearchLog {
+  id        Int      @id @default(autoincrement())
+  query     String
+  results   Int
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("search_logs")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     // SUPER_ADMIN, CATALOGUE, SALES
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Page {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  body      String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("pages")
+}
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  subtitle  String?
+  imageUrl  String
+  link      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+
+  @@map("banners")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}

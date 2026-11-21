@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 150" width="480" height="150">
+  <g transform="translate(20,15)">
+    <path d="M106.5,53.3 L117.8,55.4 L117.8,64.6 L106.5,66.7 L103.7,77.4 L112.3,85.0 L107.8,92.9 L96.9,89.1 L89.1,96.9 L92.9,107.8 L85.0,112.3 L77.4,103.7 L66.7,106.5 L64.6,117.8 L55.4,117.8 L53.3,106.5 L42.6,103.7 L35.0,112.3 L27.1,107.8 L30.9,96.9 L23.1,89.1 L12.2,92.9 L7.7,85.0 L16.3,77.4 L13.5,66.7 L2.2,64.6 L2.2,55.4 L13.5,53.3 L16.3,42.6 L7.7,35.0 L12.2,27.1 L23.1,30.9 L30.9,23.1 L27.1,12.2 L35.0,7.7 L42.6,16.3 L53.3,13.5 L55.4,2.2 L64.6,2.2 L66.7,13.5 L77.4,16.3 L85.0,7.7 L92.9,12.2 L89.1,23.1 L96.9,30.9 L107.8,27.1 L112.3,35.0 L103.7,42.6 Z M60.01,60 A0.01,0.01 0 1,0 59.99,60 A0.01,0.01 0 1,0 60.01,60 Z" fill="#38BDF8" fill-rule="evenodd"/>
+    <path d="M44,36 V84 M76,36 V84" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+    <rect x="44" y="56" width="32" height="8" fill="#F26B1D"/>
+  </g>
+  <text x="160" y="78" font-family="Montserrat, Poppins, 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="54" fill="#FFFFFF" textLength="270" lengthAdjust="spacing">HASTINA</text>
+  <text x="162" y="102" font-family="Montserrat, Poppins, 'Segoe UI', Arial, sans-serif" font-weight="700" font-size="20" fill="#94A3B8" textLength="266" lengthAdjust="spacing">MOTOR PARTS</text>
+  <rect x="162" y="113" width="46" height="3" fill="#F26B1D"/>
+  <text x="216" y="118" font-family="Montserrat, Poppins, 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="10.5" font-style="italic" fill="#F26B1D">From India to the World</text>
+</svg>

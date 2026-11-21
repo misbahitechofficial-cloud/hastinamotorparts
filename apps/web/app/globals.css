@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Original Luxury Palette */
+    --color-primary: #54A5BE;
+    --color-primary-rgb: 84, 165, 190;
+    --color-primary-hsl: 194, 45%, 54%;
+    
+    --color-secondary: #BFB59E;
+    --color-secondary-rgb: 191, 181, 158;
+    --color-secondary-hsl: 42, 21%, 68%;
+    
+    --color-accent: #5A3E36;
+    --color-accent-rgb: 90, 62, 54;
+    --color-accent-hsl: 13, 25%, 28%;
+    
+    --color-alloy: #C8C9CE;
+    --color-alloy-rgb: 200, 201, 206;
+    --color-alloy-hsl: 230, 6%, 80%;
+    
+    --color-charcoal: #232323;
+    --color-charcoal-rgb: 35, 35, 35;
+    --color-charcoal-hsl: 0, 0%, 14%;
+    
+    --color-surface: #FFFFFF;
+    --color-bg-base: #FFFFFF;
+
+    --background: #F8F9FB;
+    --foreground: #232323;
+    --border: #C8C9CE;
+  }
+
+  body {
+    background-color: #F8F9FB;
+    color: #232323;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  ::selection {
+    background-color: rgba(84, 165, 190, 0.25);
+    color: #232323;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Clean utility classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 201, 206, 0.4);
+}
+
+.dark-glass-panel {
+  background: rgba(23, 25, 28, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scooter-stage-canvas {
+  touch-action: pan-y pinch-zoom;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Tech Grid Patterns from HTML Template */
+.tech-grid {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.tech-grid-light {
+  background-image: linear-gradient(to right, rgba(11,37,69,0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(11,37,69,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
