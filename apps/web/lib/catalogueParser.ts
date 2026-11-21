@@ -34,205 +34,260 @@ export interface CatalogPartItem {
   modelsCompat?: string[];
 }
 
+export function formatCatalogueRow(idx: number): CatalogPartItem {
+  const row = CATALOGUE_DB.r[idx];
+  const m = CATALOGUE_DB.m[row[0]];
+  const catName = CATALOGUE_DB.c[row[2]] || 'General Components';
+  const catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const partNo = row[3];
+  const desc = row[4];
+  const stdQty = String(row[5] || '1');
+  const refNo = String(row[6] || '');
+  const imgUrl = row[7] || '/images/hero-motorcycle-showcase.png';
+
+  const pSlug = `${partNo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${m.slug}`;
+
+  return {
+    id: `${m.code}-${partNo}-${idx}`,
+    name: desc,
+    partNumber: partNo,
+    oemNumber: partNo,
+    slug: pSlug,
+    description: `${desc} (Assembly: ${row[1]}${refNo ? `, Item Ref #${refNo}` : ''})`,
+    category: {
+      id: catSlug,
+      name: catName,
+      slug: catSlug,
+    },
+    brand: {
+      id: m.brandSlug,
+      name: m.brand,
+      slug: m.brandSlug,
+    },
+    model: {
+      id: m.slug,
+      name: m.label,
+      slug: m.slug,
+      vehicleType: 'Two Wheeler',
+    },
+    compatModelSlugs: [m.slug, m.code.toLowerCase()],
+    grade: 'OEM Genuine',
+    moq: 1,
+    unit: 'PCS',
+    origin: 'India',
+    imageUrl: imgUrl,
+    images: [imgUrl],
+    specifications: {
+      'Figure Assembly': row[1],
+      'Item Ref': refNo || 'N/A',
+      'Standard Qty': stdQty,
+      'Model': m.label,
+      'Brand': m.brand,
+    },
+    modelsCompat: [m.label],
+  };
+}
+
 let cachedParts: CatalogPartItem[] | null = null;
 
 export function getAllCatalogueParts(): CatalogPartItem[] {
   if (cachedParts && cachedParts.length > 0) {
     return cachedParts;
   }
-
   const parts: CatalogPartItem[] = [];
+  for (let idx = 0; idx < CATALOGUE_DB.r.length; idx++) {
+    parts.push(formatCatalogueRow(idx));
+  }
+  cachedParts = parts;
+  return cachedParts;
+}
+
+export function searchCatalogueParts(
+  query: string,
+  filters: {
+    brand?: string;
+    model?: string;
+    category?: string;
+    limit?: number;
+    offset?: number;
+  } = {}
+): {
+  items: CatalogPartItem[];
+  total: number;
+} {
   const rows = CATALOGUE_DB.r;
   const models = CATALOGUE_DB.m;
   const categories = CATALOGUE_DB.c;
 
+  const q = query.trim().toLowerCase();
+  const words = q ? q.split(/\s+/).filter(Boolean) : [];
+
+  const brandFilter = filters.brand && filters.brand !== 'all' ? filters.brand.toLowerCase() : null;
+  const modelFilter = filters.model && filters.model !== 'all' ? filters.model.toLowerCase() : null;
+  const catFilter = filters.category && filters.category !== 'all' ? filters.category.toLowerCase() : null;
+
+  const matchedIndices: number[] = [];
+
   for (let idx = 0; idx < rows.length; idx++) {
     const row = rows[idx];
     const m = models[row[0]];
-    const catName = categories[row[2]] || 'General Components';
-    const catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const partNo = row[3];
-    const desc = row[4];
-    const stdQty = String(row[5] || '1');
-    const refNo = String(row[6] || '');
-    const imgUrl = row[7] || '/images/hero-motorcycle-showcase.png';
+    const catName = categories[row[2]] || '';
 
-    const pSlug = `${partNo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${m.slug}`;
-
-    parts.push({
-      id: `${m.code}-${partNo}-${idx}`,
-      name: desc,
-      partNumber: partNo,
-      oemNumber: partNo,
-      slug: pSlug,
-      description: `${desc} (Assembly: ${row[1]}${refNo ? `, Item Ref #${refNo}` : ''})`,
-      category: {
-        id: catSlug,
-        name: catName,
-        slug: catSlug
-      },
-      brand: {
-        id: m.brandSlug,
-        name: m.brand,
-        slug: m.brandSlug
-      },
-      model: {
-        id: m.slug,
-        name: m.label,
-        slug: m.slug,
-        vehicleType: 'Two Wheeler'
-      },
-      compatModelSlugs: [m.slug, m.code.toLowerCase()],
-      grade: 'OEM Genuine',
-      moq: 1,
-      unit: 'PCS',
-      origin: 'India',
-      imageUrl: imgUrl,
-      images: [imgUrl],
-      specifications: {
-        'Figure Assembly': row[1],
-        'Item Ref': refNo || 'N/A',
-        'Standard Qty': stdQty,
-        'Model': m.label,
-        'Brand': m.brand
-      },
-      modelsCompat: [m.label]
-    });
-  }
-
-  cachedParts = parts;
-  console.log(`[Catalogue Loader] Loaded ${cachedParts.length} parts across ${models.length} models.`);
-  return cachedParts;
-}
-
-export function searchCatalogueParts(query: string, filters: {
-  brand?: string;
-  model?: string;
-  category?: string;
-  limit?: number;
-  offset?: number;
-} = {}): {
-  items: CatalogPartItem[];
-  total: number;
-} {
-  const all = getAllCatalogueParts();
-  const q = query.trim().toLowerCase();
-
-  let filtered = all.filter(p => {
     // Brand filter
-    if (filters.brand && filters.brand !== 'all') {
-      if (p.brand.slug !== filters.brand.toLowerCase() && p.brand.name.toLowerCase() !== filters.brand.toLowerCase()) {
-        return false;
+    if (brandFilter) {
+      if (m.brandSlug !== brandFilter && m.brand.toLowerCase() !== brandFilter) {
+        continue;
       }
     }
 
-    // Model filter (supports direct slug, code, or model name)
-    if (filters.model && filters.model !== 'all') {
-      const target = filters.model.toLowerCase().trim();
-      const directMatch = p.model.slug === target || p.model.slug.includes(target) || target.includes(p.model.slug);
-      const compatMatch = p.compatModelSlugs?.some(s => s === target || s.includes(target) || target.includes(s));
-      const nameMatch = p.model.name.toLowerCase().includes(target);
-      if (!directMatch && !compatMatch && !nameMatch) {
-        return false;
+    // Model filter
+    if (modelFilter) {
+      const slugMatch = m.slug === modelFilter || m.slug.includes(modelFilter) || modelFilter.includes(m.slug);
+      const codeMatch = m.code.toLowerCase() === modelFilter;
+      const labelMatch = m.label.toLowerCase().includes(modelFilter);
+      if (!slugMatch && !codeMatch && !labelMatch) {
+        continue;
       }
     }
 
     // Category filter
-    if (filters.category && filters.category !== 'all') {
-      const catTarget = filters.category.toLowerCase().trim();
-      const slugMatch = p.category.slug === catTarget || p.category.slug.includes(catTarget);
-      const nameMatch = p.category.name.toLowerCase().includes(catTarget);
+    if (catFilter) {
+      const catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const directMatch = catSlug === catFilter || catSlug.includes(catFilter) || catName.toLowerCase().includes(catFilter);
 
       let genericMatch = false;
-      if (catTarget === 'engine-parts') {
-        genericMatch = /cylinder|crank|head|valve|piston|cam|engine|oil|gasket|carburetor|throttle/i.test(p.category.name);
-      } else if (catTarget === 'clutch-parts') {
-        genericMatch = /clutch/i.test(p.category.name);
-      } else if (catTarget === 'brake-parts' || catTarget === 'brake-system') {
-        genericMatch = /brake|caliper|shoe|pad|disc|master cylinder/i.test(p.category.name);
-      } else if (catTarget === 'filters') {
-        genericMatch = /cleaner|filter|air/i.test(p.category.name);
-      } else if (catTarget === 'transmission-parts') {
-        genericMatch = /transmission|belt|roller|pulley|gear|chain|sprocket|wheel/i.test(p.category.name);
-      } else if (catTarget === 'electrical-parts') {
-        genericMatch = /electrical|switch|wire|lamp|starter|magneto|spark|speedometer|battery/i.test(p.category.name);
-      } else if (catTarget === 'body-parts') {
-        genericMatch = /cover|fender|handle|frame|panel|shield|stand|muffler/i.test(p.category.name);
+      if (catFilter === 'engine' || catFilter === 'engine-parts') {
+        genericMatch = /cylinder|crank|head|valve|piston|cam|engine|oil|gasket|carburetor|throttle/i.test(catName);
+      } else if (catFilter === 'clutch' || catFilter === 'clutch-parts') {
+        genericMatch = /clutch/i.test(catName);
+      } else if (catFilter === 'brake' || catFilter === 'brake-parts' || catFilter === 'brake-system') {
+        genericMatch = /brake|caliper|shoe|pad|disc|master cylinder/i.test(catName);
+      } else if (catFilter === 'filters') {
+        genericMatch = /cleaner|filter|air/i.test(catName);
+      } else if (catFilter === 'transmission' || catFilter === 'transmission-parts') {
+        genericMatch = /transmission|belt|roller|pulley|gear|chain|sprocket|wheel/i.test(catName);
+      } else if (catFilter === 'electrical' || catFilter === 'electrical-parts') {
+        genericMatch = /electrical|switch|wire|lamp|starter|magneto|spark|speedometer|battery/i.test(catName);
+      } else if (catFilter === 'suspension') {
+        genericMatch = /shock|absorber|fork|suspension|steering|damper/i.test(catName);
+      } else if (catFilter === 'body-parts') {
+        genericMatch = /cover|fender|handle|frame|panel|shield|stand|muffler/i.test(catName);
       }
 
-      if (!slugMatch && !nameMatch && !genericMatch) return false;
+      if (!directMatch && !genericMatch) {
+        continue;
+      }
     }
 
-    // Search query
-    if (q) {
-      const words = q.split(/\s+/).filter(Boolean);
-      const pn = p.partNumber.toLowerCase();
+    // Search query words
+    if (words.length > 0) {
+      const pn = row[3].toLowerCase();
       const pnClean = pn.replace(/[^a-z0-9]/g, '');
-      const name = p.name.toLowerCase();
-      const cat = p.category.name.toLowerCase();
-      const model = p.model.name.toLowerCase();
-      const desc = p.description.toLowerCase();
+      const desc = row[4].toLowerCase();
+      const fig = row[1].toLowerCase();
+      const modelLabel = m.label.toLowerCase();
 
-      const allWordsMatch = words.every(w => {
+      const allMatch = words.every((w) => {
         const wClean = w.replace(/[^a-z0-9]/g, '');
-        return pn.includes(w) ||
-               (wClean.length > 2 && pnClean.includes(wClean)) ||
-               name.includes(w) ||
-               cat.includes(w) ||
-               model.includes(w) ||
-               desc.includes(w);
+        return (
+          pn.includes(w) ||
+          (wClean.length > 2 && pnClean.includes(wClean)) ||
+          desc.includes(w) ||
+          catName.toLowerCase().includes(w) ||
+          modelLabel.includes(w) ||
+          fig.includes(w)
+        );
       });
 
-      if (!allWordsMatch) return false;
+      if (!allMatch) {
+        continue;
+      }
     }
 
-    return true;
-  });
+    matchedIndices.push(idx);
+  }
 
-  const total = filtered.length;
+  const total = matchedIndices.length;
   const offset = filters.offset || 0;
   const limit = filters.limit || 12;
-  const items = filtered.slice(offset, offset + limit);
+  const slice = matchedIndices.slice(offset, offset + limit);
+
+  const items = slice.map((idx) => formatCatalogueRow(idx));
 
   return { items, total };
 }
 
 export function getModelCategories(modelSlug: string): { slug: string; name: string; count: number }[] {
-  const parts = getAllCatalogueParts().filter(p => {
-    const target = modelSlug.toLowerCase().trim();
-    return p.model.slug === target || p.compatModelSlugs?.includes(target);
-  });
+  const rows = CATALOGUE_DB.r;
+  const models = CATALOGUE_DB.m;
+  const categories = CATALOGUE_DB.c;
 
-  const catMap = new Map<string, { slug: string; name: string; count: number }>();
-  parts.forEach(p => {
-    const existing = catMap.get(p.category.slug);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      catMap.set(p.category.slug, {
-        slug: p.category.slug,
-        name: p.category.name,
-        count: 1
-      });
+  const target = modelSlug.toLowerCase().trim();
+  const catCounts = new Map<number, number>();
+
+  for (let idx = 0; idx < rows.length; idx++) {
+    const row = rows[idx];
+    const m = models[row[0]];
+    if (m.slug === target || m.code.toLowerCase() === target || m.slug.includes(target)) {
+      const cIdx = row[2];
+      catCounts.set(cIdx, (catCounts.get(cIdx) || 0) + 1);
     }
+  }
+
+  const result: { slug: string; name: string; count: number }[] = [];
+  catCounts.forEach((count, cIdx) => {
+    const name = categories[cIdx] || 'General';
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    result.push({ slug, name, count });
   });
 
-  return Array.from(catMap.values()).sort((a, b) => b.count - a.count);
+  return result.sort((a, b) => b.count - a.count);
 }
 
 export function getPartBySlugFromCatalogue(slug: string): CatalogPartItem | null {
-  const all = getAllCatalogueParts();
   const normalized = slug.trim().toLowerCase();
-  
-  // Try exact slug
-  let found = all.find(p => p.slug === normalized);
-  if (found) return found;
+  const rows = CATALOGUE_DB.r;
+  const models = CATALOGUE_DB.m;
 
-  // Try part number match
-  found = all.find(p => {
-    const pnNorm = p.partNumber.toLowerCase().replace(/[^a-z0-9]/g, '');
-    return normalized.includes(pnNorm);
-  });
+  // 1. First attempt: match by constructed slug
+  for (let idx = 0; idx < rows.length; idx++) {
+    const row = rows[idx];
+    const m = models[row[0]];
+    const partNo = row[3];
+    const pSlug = `${partNo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${m.slug}`;
+    if (pSlug === normalized) {
+      return formatCatalogueRow(idx);
+    }
+  }
 
-  return found || null;
+  // 2. Second attempt: match by raw part number
+  const cleanTarget = normalized.replace(/[^a-z0-9]/g, '');
+  for (let idx = 0; idx < rows.length; idx++) {
+    const row = rows[idx];
+    const pnClean = row[3].toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (pnClean.length > 3 && (cleanTarget === pnClean || cleanTarget.includes(pnClean) || pnClean.includes(cleanTarget))) {
+      return formatCatalogueRow(idx);
+    }
+  }
+
+  return null;
+}
+
+export function getRelatedPartsFromCatalogue(partSlug: string, limit: number = 4): CatalogPartItem[] {
+  const target = getPartBySlugFromCatalogue(partSlug);
+  if (!target) return [];
+
+  const rows = CATALOGUE_DB.r;
+  const models = CATALOGUE_DB.m;
+  const related: CatalogPartItem[] = [];
+
+  for (let idx = 0; idx < rows.length && related.length < limit; idx++) {
+    const row = rows[idx];
+    const m = models[row[0]];
+    if (m.slug === target.model.slug && row[3] !== target.partNumber) {
+      related.push(formatCatalogueRow(idx));
+    }
+  }
+
+  return related;
 }

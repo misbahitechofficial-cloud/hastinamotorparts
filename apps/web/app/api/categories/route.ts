@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getAllCatalogueParts, getModelCategories } from '@/lib/catalogueParser';
+import { getModelCategories } from '@/lib/catalogueParser';
+import { CATALOGUE_DB } from '@/lib/embeddedCatalogue';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -13,26 +14,26 @@ export async function GET(request: Request) {
     });
   }
 
-  const parts = getAllCatalogueParts();
-  const categoryMap = new Map<string, any>();
+  const catCounts = new Map<number, number>();
+  const rows = CATALOGUE_DB.r;
+  const categories = CATALOGUE_DB.c;
 
-  parts.forEach(p => {
-    if (!categoryMap.has(p.category.slug)) {
-      categoryMap.set(p.category.slug, {
-        id: p.category.slug,
-        name: p.category.name,
-        slug: p.category.slug,
-        count: 1
-      });
-    } else {
-      categoryMap.get(p.category.slug).count += 1;
-    }
+  for (let i = 0; i < rows.length; i++) {
+    const cIdx = rows[i][2];
+    catCounts.set(cIdx, (catCounts.get(cIdx) || 0) + 1);
+  }
+
+  const categoryList: { id: string; name: string; slug: string; count: number }[] = [];
+  catCounts.forEach((count, cIdx) => {
+    const name = categories[cIdx] || 'General';
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    categoryList.push({ id: slug, name, slug, count });
   });
 
-  const categories = Array.from(categoryMap.values()).sort((a, b) => b.count - a.count);
+  categoryList.sort((a, b) => b.count - a.count);
 
   return NextResponse.json({
     success: true,
-    categories
+    categories: categoryList
   });
 }

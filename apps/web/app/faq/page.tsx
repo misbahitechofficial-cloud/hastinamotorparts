@@ -26,8 +26,25 @@ const FAQS = [
 ];
 
 export default function FAQPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-12 sm:py-16 space-y-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="text-center space-y-2">
         <div className="flex justify-center mb-2">
           <img

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getPartBySlugFromCatalogue, getAllCatalogueParts } from '@/lib/catalogueParser';
+import { getPartBySlugFromCatalogue, getRelatedPartsFromCatalogue } from '@/lib/catalogueParser';
 
 export async function GET(
   request: Request,
@@ -16,11 +16,7 @@ export async function GET(
       }, { status: 404 });
     }
 
-    // Find related parts from the same category or model
-    const all = getAllCatalogueParts();
-    const relatedParts = all
-      .filter(p => p.id !== part.id && (p.category.slug === part.category.slug || p.model.slug === part.model.slug))
-      .slice(0, 4);
+    const relatedParts = getRelatedPartsFromCatalogue(slug, 4);
 
     return NextResponse.json({
       success: true,

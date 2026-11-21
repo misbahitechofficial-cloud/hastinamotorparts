@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { searchCatalogueParts, getAllCatalogueParts } from '@/lib/catalogueParser';
+import { searchCatalogueParts } from '@/lib/catalogueParser';
+import { CATALOGUE_DB } from '@/lib/embeddedCatalogue';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,19 +56,15 @@ export async function GET(request: Request) {
       m.slug.toLowerCase().includes(qLower)
     );
 
-    // Categories suggestion from parts
-    const all = getAllCatalogueParts();
-    const categorySet = new Map<string, any>();
-    all.forEach(p => {
-      if (p.category.name.toLowerCase().includes(qLower) && !categorySet.has(p.category.slug)) {
-        categorySet.set(p.category.slug, {
-          id: p.category.slug,
-          name: p.category.name,
-          slug: p.category.slug
-        });
-      }
-    });
-    const suggestedCategories = Array.from(categorySet.values()).slice(0, 5);
+    // Categories suggestion from CATALOGUE_DB.c directly
+    const suggestedCategories = CATALOGUE_DB.c
+      .filter((c) => c.toLowerCase().includes(qLower))
+      .slice(0, 5)
+      .map((c) => ({
+        id: c.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name: c,
+        slug: c.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      }));
 
     return NextResponse.json({
       success: true,
