@@ -792,65 +792,40 @@ export default function HomePage() {
         {/* 6 Category Cards Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
 
-          {/* Card 1: Automotive Parts */}
+          {/* Card 1: Scooters & Scooty */}
           <Link
-            href="/products?category=automotive"
+            href="/brands?brand=suzuki#catalogue"
             className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
           >
             <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
               <img
-                src="/images/categories/automotive.jpg"
-                alt="Automotive Parts"
+                src="/images/categories/scooter.jpg"
+                alt="Scooters & Scooty Parts"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
             <div className="p-3 text-center flex-1 flex flex-col items-center">
               <span className="w-8 h-8 rounded-full bg-white border border-[#f3d8c6] text-[#f36b21] -mt-7 shadow-md flex items-center justify-center text-sm font-bold z-10">
-                🚘
+                🛵
               </span>
               <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
-                Automotive Parts
+                Scooters &amp; Scooty
               </h3>
               <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Passenger vehicle components
+                Access, Burgman, Vespa, Aprilia
               </p>
             </div>
           </Link>
 
-          {/* Card 2: Commercial Vehicle Parts */}
+          {/* Card 2: Motorcycles & Bikes */}
           <Link
-            href="/products?category=commercial"
-            className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
-          >
-            <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
-              <img
-                src="/images/categories/commercial.jpg"
-                alt="Commercial Vehicle Parts"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-3 text-center flex-1 flex flex-col items-center">
-              <span className="w-8 h-8 rounded-full bg-white border border-[#f3d8c6] text-[#f36b21] -mt-7 shadow-md flex items-center justify-center text-sm font-bold z-10">
-                🚚
-              </span>
-              <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
-                Commercial Vehicle Parts
-              </h3>
-              <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Heavy-duty vehicle components
-              </p>
-            </div>
-          </Link>
-
-          {/* Card 3: Motorcycle Parts */}
-          <Link
-            href="/products?category=motorcycle"
+            href="/brands?brand=suzuki#catalogue"
             className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
           >
             <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
               <img
                 src="/images/categories/motorcycle.jpg"
-                alt="Motorcycle Parts"
+                alt="Motorcycles & Bikes"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -859,10 +834,35 @@ export default function HomePage() {
                 🏍
               </span>
               <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
-                Motorcycle Parts
+                Motorcycles &amp; Bikes
               </h3>
               <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Two-wheeler components
+                Gixxer, Boxer, V-Strom, Intruder
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 3: 3-Wheeler / Tuk-Tuk */}
+          <Link
+            href="/models/bajaj/bajaj-re-4s-4-stroke"
+            className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
+          >
+            <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
+              <img
+                src="/images/categories/tuktuk.jpg"
+                alt="3-Wheeler & Tuk-Tuk Parts"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-3 text-center flex-1 flex flex-col items-center">
+              <span className="w-8 h-8 rounded-full bg-white border border-[#f3d8c6] text-[#f36b21] -mt-7 shadow-md flex items-center justify-center text-sm font-bold z-10">
+                🛺
+              </span>
+              <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
+                3-Wheeler / Tuk-Tuk
+              </h3>
+              <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
+                Bajaj RE 4-Stroke Commercial
               </p>
             </div>
           </Link>
@@ -887,12 +887,12 @@ export default function HomePage() {
                 Engine Components
               </h3>
               <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Engine &amp; mechanical spare parts
+                Cylinders, Pistons, Crankshafts
               </p>
             </div>
           </Link>
 
-          {/* Card 5: Brake System */}
+          {/* Card 5: Brake & Transmission */}
           <Link
             href="/products?category=brake"
             className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
@@ -900,24 +900,24 @@ export default function HomePage() {
             <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
               <img
                 src="/images/categories/brake.jpg"
-                alt="Brake System"
+                alt="Brake & Transmission System"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
             <div className="p-3 text-center flex-1 flex flex-col items-center">
               <span className="w-8 h-8 rounded-full bg-white border border-[#f3d8c6] text-[#f36b21] -mt-7 shadow-md flex items-center justify-center text-sm font-bold z-10">
-                ◉
+                🛑
               </span>
               <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
-                Brake System
+                Brake &amp; Transmission
               </h3>
               <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Brake pads, discs and related parts
+                Discs, Pads, Shoes, Belts &amp; Clutch
               </p>
             </div>
           </Link>
 
-          {/* Card 6: Suspension & Steering */}
+          {/* Card 6: Suspension & Electrical */}
           <Link
             href="/products?category=suspension"
             className="group bg-white rounded-2xl overflow-hidden border border-[#e1e7ee] shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
@@ -925,7 +925,7 @@ export default function HomePage() {
             <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100">
               <img
                 src="/images/categories/suspension.jpg"
-                alt="Suspension & Steering"
+                alt="Suspension & Electrical"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -934,10 +934,10 @@ export default function HomePage() {
                 🔧
               </span>
               <h3 className="text-xs sm:text-sm font-black text-[#102b4c] mt-2 mb-1 group-hover:text-[#f36b21] transition-colors leading-tight">
-                Suspension &amp; Steering
+                Suspension &amp; Electrical
               </h3>
               <p className="text-[10px] sm:text-[11px] text-[#627188] leading-tight">
-                Shocks, struts, control arms &amp; more
+                Forks, Shocks, Starters, Harnesses
               </p>
             </div>
           </Link>
