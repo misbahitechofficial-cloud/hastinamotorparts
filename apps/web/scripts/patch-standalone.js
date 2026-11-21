@@ -14,48 +14,43 @@ if (!fs.existsSync(serverJsPath)) {
 
 let content = fs.readFileSync(serverJsPath, 'utf8');
 
-// Replace port and hostname logic with LiteSpeed / Phusion Passenger Unix socket compatible handler
-const newPortLogic = `// LiteSpeed Web Server & Phusion Passenger Socket Compatibility Fix
-let currentPort = parseInt(process.env.PORT, 10) || 3000;
-let hostname = process.env.HOSTNAME || '0.0.0.0';
-
-// Check if LiteSpeed or Hostinger passed a Unix domain socket path in HOSTNAME or PORT
-const sockCandidate = (process.env.HOSTNAME && (process.env.HOSTNAME.includes('.sock') || process.env.HOSTNAME.includes('/')))
-  ? process.env.HOSTNAME
-  : (process.env.PORT && (String(process.env.PORT).includes('.sock') || String(process.env.PORT).includes('/')) ? process.env.PORT : null);
-
-if (sockCandidate) {
-  // Bind directly to the Unix domain socket so LiteSpeed can proxy requests instantly
-  currentPort = sockCandidate;
-  hostname = undefined;
-  console.log('[Hastina Server] Binding to LiteSpeed Unix socket:', currentPort);
-} else if (process.env.PORT === 'passenger') {
-  currentPort = 'passenger';
-  hostname = undefined;
-  console.log('[Hastina Server] Passenger hook mode');
-} else {
-  console.log('[Hastina Server] Standard TCP mode on', hostname, ':', currentPort);
-}`;
-
-// Pattern matches either our previous patch or the stock Next.js code
-const oldPattern1 = "const currentPort = parseInt(process.env.PORT, 10) || 3000\nconst hostname = process.env.HOSTNAME || '0.0.0.0'";
-const oldPattern2 = `// Phusion Passenger / Hostinger LiteSpeed compatibility fix
+// The new port logic ALWAYS leaves hostname as undefined.
+// This is mandatory for Phusion Passenger & LiteSpeed so that Passenger can intercept
+// http.Server.prototype.listen() without being bypassed by a host argument.
+const newPortLogic = `// Phusion Passenger & LiteSpeed compatibility fix
 const rawPort = process.env.PORT;
-const isPassenger = rawPort === 'passenger' || (typeof rawPort === 'string' && (rawPort.includes('/') || rawPort.includes('\\\\') || isNaN(Number(rawPort))));
-const currentPort = isPassenger ? rawPort : (parseInt(rawPort, 10) || 3000);
-const hostname = isPassenger ? undefined : (process.env.HOSTNAME || '0.0.0.0');
-console.log('[Hastina Server] PORT env:', rawPort, '| isPassenger:', isPassenger, '| Listening on:', currentPort, '| Hostname:', hostname);`;
+const isNumeric = rawPort && !isNaN(Number(rawPort));
+const currentPort = isNumeric ? parseInt(rawPort, 10) : (rawPort || 3000);
+// CRITICAL: NEVER pass '0.0.0.0' or 'localhost' as hostname!
+// Passenger only hooks server.listen() when the hostname argument is omitted.
+const hostname = undefined;
+console.log('[Hastina Server] Passenger-ready listening on port:', currentPort, '(hostname: undefined)');`;
 
-if (content.includes(oldPattern2)) {
-  content = content.replace(oldPattern2, newPortLogic);
+// Find everything from start of port definition to keepAliveTimeout
+const startMarker = "// LiteSpeed Web Server & Phusion Passenger Socket Compatibility Fix";
+const oldDefault = "const currentPort = parseInt(process.env.PORT, 10) || 3000\nconst hostname = process.env.HOSTNAME || '0.0.0.0'";
+
+if (content.includes(startMarker)) {
+  const parts = content.split(startMarker);
+  const afterMarker = parts[1];
+  const endIdx = afterMarker.indexOf("let keepAliveTimeout");
+  if (endIdx !== -1) {
+    content = parts[0] + newPortLogic + "\n\n" + afterMarker.substring(endIdx);
+    fs.writeFileSync(serverJsPath, content, 'utf8');
+    console.log('[patch-standalone] Successfully replaced custom port logic in server.js!');
+  }
+} else if (content.includes(oldDefault)) {
+  content = content.replace(oldDefault, newPortLogic);
   fs.writeFileSync(serverJsPath, content, 'utf8');
-  console.log('[patch-standalone] Successfully updated server.js with LiteSpeed socket handler!');
-} else if (content.includes(oldPattern1)) {
-  content = content.replace(oldPattern1, newPortLogic);
-  fs.writeFileSync(serverJsPath, content, 'utf8');
-  console.log('[patch-standalone] Successfully patched server.js with LiteSpeed socket handler!');
+  console.log('[patch-standalone] Successfully replaced default Next port logic in server.js!');
 } else {
-  console.warn('[patch-standalone] Could not find target pattern in server.js');
+  console.warn('[patch-standalone] Target pattern not found in server.js. Looking for currentPort pattern...');
+  const portRegex = /const currentPort = [\s\S]*?const hostname = [^\n]*\n/;
+  if (portRegex.test(content)) {
+    content = content.replace(portRegex, newPortLogic + '\n');
+    fs.writeFileSync(serverJsPath, content, 'utf8');
+    console.log('[patch-standalone] Successfully patched server.js with regex match!');
+  }
 }
 
 // Ensure .next/static is copied to .next/standalone/.next/static
